@@ -77,7 +77,7 @@ include_once $sources['builder_includes'] . 'category.php';
 # include_once $sources['builder_includes'] . 'plugins.php';
 
 /* add snippets */
-# include_once $sources['builder_includes'] . 'snippets.php';
+include_once $sources['builder_includes'] . 'snippets.php';
 
 /* add chunks */
 # include_once $sources['builder_includes'] . 'chunks.php';

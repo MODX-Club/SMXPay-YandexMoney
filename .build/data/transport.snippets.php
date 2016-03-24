@@ -8,7 +8,8 @@ $list = array('yandexmoney.getButton','yandexmoney.payResult');
 
 foreach ($list as $v) {
     $snippet_name = $v;
-    $content = getSnippetContent($sources['snippets'] . $snippet_name . '.snippet.php');
+    $snippet_path = $sources['snippets'] . $snippet_name . '.snippet.php';
+    $content = getSnippetContent($snippet_path);
 
     if (!empty($content)) {
         $snippet = $modx->newObject('modSnippet');
