@@ -1,13 +1,14 @@
 <?php
+
 ignore_user_abort(true);
 set_time_limit(0);
 
-include_once __DIR__ . '/package.php';
+include_once __DIR__.'/package.php';
 
 /* define package */
 define('PKG_NAME', $pkgName);
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
-define('PKG_NAME_UPPER', strtoupper(substr($pkgName, 0, 1)) . substr($pkgName, 1));
+define('PKG_NAME_UPPER', strtoupper(substr($pkgName, 0, 1)).substr($pkgName, 1));
 define('NAMESPACE_NAME', PKG_NAME_LOWER);
 
 define('PKG_PATH', PKG_NAME_LOWER);
@@ -16,14 +17,13 @@ define('PKG_CATEGORY', PKG_NAME);
 define('PKG_VERSION', $pkgVersion);
 define('PKG_RELEASE', $pkgRelease);
 
-$mtime= microtime();
-$mtime= explode(" ", $mtime);
-$mtime= $mtime[1] + $mtime[0];
+$mtime = microtime();
+$mtime = explode(' ', $mtime);
+$mtime = $mtime[1] + $mtime[0];
 $tstart = $mtime;
 
-
-print '<pre>';
-require_once dirname(__FILE__). '/build.config.php';
+echo '<pre>';
+require_once dirname(__FILE__).'/build.config.php';
 
 /*
  * Set log Params
@@ -51,7 +51,7 @@ $builder->registerNamespace(PKG_NAME_LOWER, false, true, '{core_path}components/
 /*
  * Add Namespace
  */
-include_once $sources['builder_includes'] . 'namespace.php';
+include_once $sources['builder_includes'].'namespace.php';
 
 /*
  * Add mediasources
@@ -61,7 +61,7 @@ include_once $sources['builder_includes'] . 'namespace.php';
 /*
  * Create system settings via vehicle
  */
-include_once $sources['builder_includes'] . 'system.settings.php';
+include_once $sources['builder_includes'].'system.settings.php';
 
 /*
  * Create custom system settings via vehicle
@@ -71,13 +71,13 @@ include_once $sources['builder_includes'] . 'system.settings.php';
 /*
  * Create Category
  */
-include_once $sources['builder_includes'] . 'category.php';
+include_once $sources['builder_includes'].'category.php';
 
 /* add plugins */
 # include_once $sources['builder_includes'] . 'plugins.php';
 
 /* add snippets */
-include_once $sources['builder_includes'] . 'snippets.php';
+include_once $sources['builder_includes'].'snippets.php';
 
 /* add chunks */
 # include_once $sources['builder_includes'] . 'chunks.php';
@@ -85,14 +85,14 @@ include_once $sources['builder_includes'] . 'snippets.php';
 /*
  * Create category vehicle
  */
-include_once $sources['builder_includes'] . 'category.attributes.php';
+include_once $sources['builder_includes'].'category.attributes.php';
 $vehicle = $builder->createVehicle($category, $attr);
 // eof Create Category
 
 /*
  * Adding sources (3 sources by default)
  */
-include_once $sources['resolvers'] . 'resolver.sources.php';
+include_once $sources['resolvers'].'resolver.sources.php';
 
 /*
  * Adding resolvers
@@ -110,19 +110,18 @@ $builder->putVehicle($vehicle);
 # include_once $sources['builder_includes'] . 'menu.php';
 
 /* now pack in the license file, readme and setup options */
-include_once $sources['builder_includes'] . 'eula.php';
-
+include_once $sources['builder_includes'].'eula.php';
 
 $modx->log(modX::LOG_LEVEL_INFO, 'Packing...'); flush();
 $builder->pack();
 
-$mtime= microtime();
-$mtime= explode(" ", $mtime);
-$mtime= $mtime[1] + $mtime[0];
-$tend= $mtime;
+$mtime = microtime();
+$mtime = explode(' ', $mtime);
+$mtime = $mtime[1] + $mtime[0];
+$tend = $mtime;
 
-$totalTime= ($tend - $tstart);
-$totalTime= sprintf("%2.4f s", $totalTime);
+$totalTime = ($tend - $tstart);
+$totalTime = sprintf('%2.4f s', $totalTime);
 
 $modx->log(modX::LOG_LEVEL_INFO, "\n<br />Package Built.<br />\nExecution time: {$totalTime}\n");
 

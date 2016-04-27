@@ -4,11 +4,11 @@ $snippets = array();
 
 /* course snippets */
 
-$list = array('yandexmoney.getButton','yandexmoney.payResult');
+$list = array('yandexmoney.getButton', 'yandexmoney.payResult');
 
 foreach ($list as $v) {
     $snippet_name = $v;
-    $snippet_path = $sources['snippets'] . $snippet_name . '.snippet.php';
+    $snippet_path = $sources['snippets'].$snippet_name.'.snippet.php';
     $content = getSnippetContent($snippet_path);
 
     if (!empty($content)) {
@@ -34,4 +34,5 @@ foreach ($list as $v) {
 }
 
 unset($properties, $snippet, $path, $snippet_name, $content, $list);
+
 return $snippets;
