@@ -1,4 +1,4 @@
-YandexMoney-1.0.0-beta
-=======================================
+Changelog file for YandexMoney component.
 
+## YandexMoney-1.0.0-beta
 First release.
