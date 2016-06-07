@@ -1,20 +1,23 @@
 <?php
-$scriptProperties = array_merge((array)$scriptProperties, (array)$_POST);
 
-$namespace = 'edinayakassa';
-if (
-    !$response = $modx->runProcessor(
-        'edinayakassa/web/payments/create',
-        $scriptProperties,
-        array(
-            'processors_path' => $modx->getObject('modNamespace', $namespace)->getCorePath().'processors/',
-        )
-    )
-    or $response->isError()
-) {
-    // return ($msg = $response->getMessage()) ? $msg :"Ошибка выполнения запроса";
-    return 'WMI_RESULT=RETRY&WMI_DESCRIPTION=Error';
+$fields = array_merge(
+    (array) $scriptProperties,
+    (array) $modx->request->getParameters([], 'POST')
+);
+
+if ($modx->getOption('debug') && $modx->hasPermission('Debug')) {
+    $modx->setLogLevel(2);
+    $modx->setLogTarget('FILE');
+    $modx->log(2, print_r($fields, 1));
 }
 
-// return $response->getMessage();
-return 'WMI_RESULT=OK&WMI_DESCRIPTION=Order successfully processed';
+if (!in_array($fields['action'], array('checkOrder', 'paymentAviso'))) {
+    $modx->sendRedirect($modx->makeUrl($modx->getOption('ShopModxYandexKassa.success_resource_id')));
+}
+
+$result = $modx->runProcessor('yandexmoney/web/public/action',
+    array('request' => $fields),
+    array('processors_path' => $modx->getObject('modNamespace', 'smxpayyandexmoney')->getCorePath().'processors/')
+);
+
+return $result->getMessage();

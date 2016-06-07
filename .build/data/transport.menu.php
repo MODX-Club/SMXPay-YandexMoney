@@ -2,7 +2,7 @@
 
 $menus = array();
 
-$action= $modx->newObject('modAction');
+$action = $modx->newObject('modAction');
 $action->fromArray(array(
   'id' => 1,
   'namespace' => NAMESPACE_NAME,
@@ -11,7 +11,7 @@ $action->fromArray(array(
   'haslayout' => true,
   'lang_topics' => NAMESPACE_NAME.':default',
   'assets' => '',
-),'',true,true);
+), '', true, true);
 
 $menu = $modx->newObject('modMenu');
 $menu->fromArray(array(
@@ -22,9 +22,9 @@ $menu->fromArray(array(
   'menuindex' => 0,
   'params' => '',
   'handler' => '',
-  'permissions'   => '',
+  'permissions' => '',
   'namespace' => NAMESPACE_NAME,
-),'',true,true);
+), '', true, true);
 
 $menu->addOne($action);
 unset($action);

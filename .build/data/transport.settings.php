@@ -2,7 +2,7 @@
 
 $settings = array();
 
-/** */
+/* */
 $setting_name = 'ShopModxYandexKassa.SC_ID';
 $setting = $modx->newObject('modSystemSetting');
 $setting->fromArray(array(
@@ -17,7 +17,7 @@ $setting->fromArray(array(
 $settings[] = $setting;
 //
 
-/** */
+/* */
 $setting_name = 'ShopModxYandexKassa.SECURITY_TYPE';
 $setting = $modx->newObject('modSystemSetting');
 $setting->fromArray(array(
@@ -31,7 +31,7 @@ $setting->fromArray(array(
 $settings[] = $setting;
 //
 
-/** */
+/* */
 $setting_name = 'ShopModxYandexKassa.SHOP_ID';
 $setting = $modx->newObject('modSystemSetting');
 $setting->fromArray(array(
@@ -46,7 +46,7 @@ $setting->fromArray(array(
 $settings[] = $setting;
 //
 
-/** */
+/* */
 $setting_name = 'ShopModxYandexKassa.SHOP_PASSWORD';
 $setting = $modx->newObject('modSystemSetting');
 $setting->fromArray(array(
@@ -60,7 +60,7 @@ $setting->fromArray(array(
 $settings[] = $setting;
 //
 
-/** */
+/* */
 $setting_name = 'ShopModxYandexKassa.bill_serv_id';
 $setting = $modx->newObject('modSystemSetting');
 $setting->fromArray(array(
@@ -74,7 +74,7 @@ $setting->fromArray(array(
 $settings[] = $setting;
 //
 
-/** */
+/* */
 $setting_name = 'ShopModxYandexKassa.pay_server';
 $setting = $modx->newObject('modSystemSetting');
 $setting->fromArray(array(
@@ -89,6 +89,21 @@ $setting->fromArray(array(
 $settings[] = $setting;
 //
 
+/* */
+$setting_name = 'ShopModxYandexKassa.success_resource_id';
+$setting = $modx->newObject('modSystemSetting');
+$setting->fromArray(array(
+ 'key' => $setting_name,
+ 'value' => '{{site_start}}',
+ 'description' => 'ID ресурса для редиректа при успешной оплате',
+ 'xtype' => 'textfield',
+ 'namespace' => NAMESPACE_NAME,
+ 'area' => 'default',
+), '', true, true);
+
+$settings[] = $setting;
+//
 
 unset($setting, $setting_name);
+
 return $settings;

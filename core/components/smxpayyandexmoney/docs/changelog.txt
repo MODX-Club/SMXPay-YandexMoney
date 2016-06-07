@@ -1,4 +1,8 @@
-YandexMoney-1.0.0-beta
-=======================================
+Changelog file for SMXPayYandexKassa component.
 
+## SMXPayYandexKassa-1.1.0-beta
+* Events added
+* Multiple fixes
+
+## SMXPayYandexKassa-1.0.0-beta
 First release.

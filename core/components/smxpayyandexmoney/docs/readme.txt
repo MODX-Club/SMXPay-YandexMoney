@@ -1,2 +1,9 @@
-Модуль оплаты сервиса Яндекс.Деньги http://api.yandex.ru/money/ для сборки интернет-магазина ShopModBox.
-Любые вопросы вы можете задавать на http://modxclub.ru
+--------------------
+Extra: SMXPayYandexKassa
+--------------------
+Version: 1.1.0
+Author: MODXClub <info@modxclub.ru>
+License: GNU GPLv2 (or later at your option)
+
+About:  Модуль оплаты сервиса [Яндекс.Касса](https://kassa.yandex.ru/) для модуля интернет-магазина ShopModx.
+        Любые вопросы вы можете задавать на https://modxclub.ru

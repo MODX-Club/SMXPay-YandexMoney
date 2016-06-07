@@ -1,5 +1,5 @@
 <?php
-// Add core source
+
 $vehicle->resolve('file', array(
     'source' => $sources['source_core'],
     'target' => "return MODX_CORE_PATH . 'components/';",
@@ -26,4 +26,3 @@ $modx->log(modX::LOG_LEVEL_INFO, 'Packaged in AssetsPath'); flush();
 #     'target' => "return MODX_BASE_PATH . 'samplepackage/';",
 # ));
 # $modx->log(modX::LOG_LEVEL_INFO,'Packaged in MibewPath'); flush();
-
