@@ -22,6 +22,13 @@ foreach ($fields as $name => $val) {
 }
 
 // Формирование HTML-кода платежной формы в Smarty-шаблоне
+$path = $modx->getObject('modNamespace', 'smxpayyandexmoney')->getCorePath();
+$path .= 'templates/web/default/';
+
+$templates = $modx->smarty->template_dir;
+$templates['yandexmoney'] = $path;
+$modx->smarty->setTemplateDir($templates);
+
 $modx->smarty->assign('fields', $fields);
 
 return $modx->smarty->fetch('yandexmoney/button.tpl');

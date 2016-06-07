@@ -1,21 +1,17 @@
 {block payment-params}
-    {$pay_form_header = $pay_form_header|default:'Оплата заказа'}
-    {$pay_sum = $pay_sum|default:500}
+    {$pay_form_header = $pay_form_header|default:'Оплата'}
+    {$sum = $sum|default:500}
     {$allow_edit_sum = $allow_edit_sum|default:true}
     {$phone_required = $phone_required|default:false}
     {$email_required = $email_required|default:false}
     {$email_field_name = $email_field_name|default:'cps_email'}
-    {$order_type = $order_type|default:''}
-    {$order_number = $order_number|default:''}
-{/block}
-{*
+    {$orderNumber = $orderNumber|default:''}
+{/block}{*
     <!-- Пример в кодировке UTF-8 (обязательно используйте именно эту кодировку для взаимодействия с Яндекс.Кассой)
     Внимание! Это только пример. Для того, чтобы он работал, обязательно пропишите в нем shopId и scid, который мы присылаем в письме на ваш контактный e-mail.
     Кроме того вам надо реализовать программную часть для CheckOrderURL и AvisoURL.
     -->
-*}
-
-{*
+*}{*
     <!--
 
     Ниже перечислены доступные формы оплаты.
@@ -57,22 +53,12 @@
     <input name="paymentType" value="MA" type="radio">Оплата через MasterPass<br>
 
     -->
-*}
-
-{*
+*}{*
     Документация: <a href="https://money.yandex.ru/doc.xml?id=526537">https://money.yandex.ru/doc.xml?id=526537</a>
 
     <!-- Тестовый яндекс.кошелек
 
-    (прежде чем использовать тестовый яндекс.кошелек, обязательно войдите в https://demomoney.yandex.ru с указанными ниже логином и паролем)
-
-
-
-    Test-for-yamoney@yandex.ru
-
-    Пароль для входа: yamoney
-
-    Платежный пароль: testforyamoney
+        (прежде чем использовать тестовый яндекс.кошелек, обязательно войдите в https://demomoney.yandex.ru с указанными ниже логином и паролем)
 
     -->
 
@@ -80,21 +66,15 @@
 
     <!-- Тестовая банковская карта
 
-
-
-    Номер карты: 4268 0337 0354 5624
+    Номер карты: 4444 4444 4444 4448
 
     Действует до: любая дата в будущем
 
     Имя и фамилия владельца: любое имя латиницей, например, IVAN DEMIDOV
 
-    Код CVV: 123
+    Код CVV/CVC: 000
 
     Email: свой e-mail
-
-
-
-    Код CVC: 123
 
     -->
 
@@ -133,10 +113,7 @@
     https://money.yandex.ru/doc.xml?id=526421
 
     -->
-*}
-
-
-{block payment-outer}
+*}{block payment-outer}
     {block payment-pre}
 
         <h2>{$pay_form_header}</h2>
@@ -159,7 +136,7 @@
 
                 {$sum = $modx->getValue($q->prepare())}
                 <div class="alert alert-info">
-                    Всего в поддержку было выполнено <strong>{$total} {$total|spell:"платеж":"платежа":"платежей"}</strong> на общую сумму <strong>{(float)$sum} {$sum|spell:"рубль":"рубля":"рублей"}</strong>.
+                    Всего было выполнено <strong>{$total} {$total|spell:"платеж":"платежа":"платежей"}</strong> на общую сумму <strong>{(float)$sum} {$sum|spell:"рубль":"рубля":"рублей"}</strong>.
                 </div>
             *}
 
@@ -175,7 +152,7 @@
                 <input type="hidden" name="shopId" value="{$modx->getOption('ShopModxYandexKassa.SHOP_ID')}">
                 <input type="hidden" name="scid" value="{$modx->getOption('ShopModxYandexKassa.SC_ID')}">
                 <input type="hidden" name="CustomerNumber" size="64" value="{$modx->user->id}">
-                <input type="hidden" name="order_type" value="{$order_type}" />
+                <input name="orderNumber" value="{$orderNumber}" type="hidden"/>
 
                 {*<!-- CustomerNumber -- до 64 символов; идентификатор плательщика в ИС Контрагента.
 
@@ -202,11 +179,9 @@
 
             {block payment-form-inner}
 
-                <input name="orderNumber" value="{$order_number}" type="hidden"/>
-
                 <div class="payment__group">
                     <label>Сумма (руб.) {if $allow_edit_sum}<span class="text-info">Сумму можно менять</span>{/if}</label>
-                    <input class="payment__control" type="text" name="sum" size="64" value="{$pay_sum}" {if !$allow_edit_sum}readonly{/if}>
+                    <input class="payment__control" type="text" name="sum" size="64" value="{$sum}" {if !$allow_edit_sum}readonly{/if}>
                 </div>
 
                 <div class="payment__group">
