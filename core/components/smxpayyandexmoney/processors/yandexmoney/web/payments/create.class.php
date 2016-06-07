@@ -1,10 +1,5 @@
 <?php
 
-#
-# require_once MODX_CORE_PATH . 'components/basket/processors/web/payments/create.class.php';
-#
-# class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProcessor{
-
 require_once MODX_CORE_PATH.'components/basket/processors/web/payments/create.class.php';
 
 class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProcessor
@@ -12,6 +7,17 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
     protected $SHOP_ID;
     protected $SHOP_PASSWORD;
     protected $SECURITY_TYPE;
+
+    private $events = array();
+
+    public function __construct(modX $modx, $properties = array())
+    {
+        parent::__construct($modx, $properties);
+
+        $modx->getService('SMXPayYandexMoney', 'services.SMXPayYandexMoney', $modx->getObject('modNamespace', 'smxpayyandexmoney')->getCorePath().'model/');
+
+        $this->events = $modx->SMXPayYandexMoney->events;
+    }
 
     public function initialize()
     {
@@ -43,7 +49,6 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
             'sum' => $this->getProperty('orderSumAmount'),
             'owner' => $this->getProperty('CustomerNumber'),
             'paysys_invoice_id' => $this->getProperty('invoiceId'),
-            # "order_type"    => $this->getProperty('EventID'),
         ));
 
         if (!$this->getProperty('hide_log')) {
@@ -57,7 +62,37 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
         return parent::initialize();
     }
 
-    # protected function __process(){
+    protected function processEvent($eventKey = '')
+    {
+        $eventName = $this->events[$eventKey];
+
+        $ok = $this->modx->invokeEvent($eventName, array(
+            'processor' => &$this,
+        ));
+
+        $ok = current($ok);
+        if ($ok != '' && $ok !== true) {
+            return $ok;
+        }
+
+        return true;
+    }
+
+    protected function beforeOrderProcess()
+    {
+        return $this->processEvent('beforeProcess');
+    }
+
+    protected function onCheckOrder()
+    {
+        return $this->processEvent('checkOrder');
+    }
+
+    protected function onPaymentAviso()
+    {
+        return $this->processEvent('paymentAviso');
+    }
+
     public function process()
     {
         $request = $this->getProperties();
@@ -65,60 +100,10 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
         $sum = (float) $this->getProperty('sum');
         $response = null;
 
-        $order_type = (int) $this->getProperty('order_type');
+        $ok = $this->beforeOrderProcess();
 
-        $this->modx->log(2, 'order_type: '.$order_type);
-
-        /*
-            Заказ демо-сайта ShopModxBox
-        */
-        if ($order_type === '1') {
-            if ($sum < 100) {
-                return $this->failure('Стоимость установки демо-сайта 100 рублей');
-            } else {
-                $this->modx->getObject('modUser', 2)->sendEmail('Email: '.$this->getProperty('email'), array(
-                    'subject' => 'Новый запрос на установку демо-магазина ShopModxBox',
-                ));
-            }
-        }
-
-        /*
-            Заказ демо-сайта NewsModxBox
-        */
-        if ($order_type === '2') {
-            if ($sum < 300) {
-                return $this->failure('Стоимость установки демо-сайта 300 рублей');
-            } else {
-                $this->modx->getObject('modUser', 2)->sendEmail('Email: '.$this->getProperty('email'), array(
-                    'subject' => 'Новый запрос на установку демо-магазина NewsModxBox',
-                ));
-            }
-        }
-
-        /*
-            Оплата мероприятия
-        */
-
-        elseif ($EventID = (int) $this->getProperty('EventID')) {
-            $this->setProperty('order_type', $EventID);
-
-            if (!$resource = $this->modx->getObject('modResource', $EventID)) {
-                return $this->failure('Не был получен объект мероприятия');
-            } elseif (
-                $cost = $resource->getTVValue('cost')
-                and $sum < $cost
-            ) {
-                return $this->failure("Оплачиваемая стоимость ниже стоимости мероприятия - {$cost} руб.");
-            } elseif (
-                $tickets_limit = $resource->getTVValue('tickets_limit')
-                and $tickets_limit <= $this->modx->getCount($this->classKey, array(
-                    'order_type' => $EventID,
-                ))
-            ) {
-                return $this->failure('Извините! Все билеты распроданы.');
-            }
-
-            # return $this->failure('Debug');
+        if ($ok !== true) {
+            return $this->failure($ok ? $ok : '');
         }
 
         /*
@@ -143,6 +128,8 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
 
                 # die('sdfds');
 
+                $this->onCheckOrder();
+
                 # return $this->success($this->buildResponse($action, $request['invoiceId'], 0));
                 return $this->success('');
                 break;
@@ -151,6 +138,8 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
                 # $request = $this->getProperty('request');
                 # $action = $this->getProperty('action');
                 # return $this->buildResponse($action, $request['invoiceId'], 0);
+
+                $this->onPaymentAviso();
 
                 break;
 
@@ -171,66 +160,6 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
         # return parent::__process();
         return parent::process();
     }
-
-    /*
-        Проверяем подпись с робокассы
-    */
-    # protected function checkSignature(){
-    #
-    #     return true;
-    # }
-
-    # protected function getSuccessMessage(){
-    #     return 'OK'.$this->getProperty('InvId');
-    # }
-
-#     public static function getInstance(modX &$modx,$className,$properties = array()) {
-#
-#         // Здесь мы имеем возможность переопределить реальный класс процессора
-#         if(!empty($properties['pub_action']) && !self::$actualClassName){
-#
-#             switch($properties['pub_action']){
-#
-#                 default:
-#
-#                     # require MODX_CORE_PATH . 'components/modxclub/processors/web/forms/form.class.php';
-#                     # self::$actualClassName = 'modWebFormsFormProcessor';
-#                     ;
-#             }
-#         }
-#
-#         if(self::$actualClassName){
-#             $className = self::$actualClassName;
-#         }
-#
-#         return parent::getInstance($modx,$className,$properties);
-#     }
-
-    # public function process(){
-    #     # $error = 'Действие не существует или не может быть выполнено';
-    #     # $this->modx->log(xPDO::LOG_LEVEL_ERROR, __CLASS__ . " - {$error}");
-    #     # $this->modx->log(xPDO::LOG_LEVEL_ERROR, print_r($this->getProperties(), true));
-    #     # return $this->failure($error);
-    #
-    #     if(!$this->getProperty('hide_log')){
-    #
-    #         $this->modx->log(1, "[- ". __CLASS__ ." -]");
-    #         $this->modx->log(1, print_r($_SERVER, 1));
-    #         $this->modx->log(1, json_encode($_SERVER));
-    #         $this->modx->log(1, print_r($_REQUEST, 1));
-    #         $this->modx->log(1, json_encode($_REQUEST));
-    #     }
-    #     else{
-    #
-    #         # print_r($this->properties);
-    #     }
-    #
-    #
-    #
-    #     # return $this->success('fdgdfg');
-    #
-    #     return $this->processRequest();
-    # }
 
     public function checkSignature()
     {
@@ -265,7 +194,7 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
 
                 $this->log('Request: '.print_r($request, true));
 
-                if (($request = $this->verifySign()) === null) {
+                if (($request = $this->verifySign()) == null) {
                     # return $this->buildResponse($action, null, 200);
                     return 'Неверная подпись';
                     # return $this->failure($response);
@@ -290,7 +219,7 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
             $request['invoiceId'].';'.$request['customerNumber'].';'.$this->SHOP_PASSWORD;
         $this->log('String to md5: '.$str);
         $md5 = strtoupper(md5($str));
-        if ($md5 !== strtoupper($request['md5'])) {
+        if ($md5 != strtoupper($request['md5'])) {
             $this->log('Wait for md5:'.$md5.', recieved md5: '.$request['md5']);
 
             return false;
@@ -320,7 +249,7 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
             $content = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
             $resCode = proc_close($process);
-            if ($resCode !== 0) {
+            if ($resCode != 0) {
                 return;
             } else {
                 $this->log('Row xml: '.$content);
@@ -363,7 +292,7 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
     {
         $performedDatetime = $this->formatDate(new DateTime());
         $response = '<?xml version="1.0" encoding="UTF-8"?><'.$functionName.'Response performedDatetime="'.$performedDatetime.
-            '" code="'.$result_code.'" '.($message !== null ? 'message="'.$message.'"' : '').' invoiceId="'.$invoiceId.'" shopId="'.$this->SHOP_ID.'"/>';
+            '" code="'.$result_code.'" '.($message != null ? 'message="'.$message.'"' : '').' invoiceId="'.$invoiceId.'" shopId="'.$this->SHOP_ID.'"/>';
 
         return $response;
     }
@@ -413,7 +342,7 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
         // https://money.yandex.ru/doc.xml?id=526537
         // Таблица 4.2.2.2. Коды результата обработки запроса checkOrder
         $code = !empty($object['code']) ? $object['code'] : 100;
-        $response = $this->buildResponse($action, $request['invoiceId'], $code, $msg);
+        $response = $this->buildResponse($action, isset($request['invoiceId']) ? $request['invoiceId'] : '', $code, $msg);
 
         return parent::failure($response, $object);
     }
