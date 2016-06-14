@@ -99,7 +99,7 @@ include_once $sources['resolvers'].'resolver.sources.php';
  */
 $modx->log(modX::LOG_LEVEL_INFO, 'Adding in PHP resolvers...'); flush();
 # include_once $sources['builder_includes'] . 'resolver.tables.wrapper.php';
-# include_once $sources['builder_includes'] . 'resolver.register.wrapper.php';
+include_once $sources['builder_includes'].'resolver.register.wrapper.php';
 // eof adding resolvers
 
 $builder->putVehicle($vehicle);
