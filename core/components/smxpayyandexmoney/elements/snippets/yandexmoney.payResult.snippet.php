@@ -11,7 +11,7 @@ if ($modx->getOption('debug') && $modx->hasPermission('Debug')) {
     $modx->log(2, print_r($fields, 1));
 }
 
-if (!in_array($fields['action'], array('checkOrder', 'paymentAviso'))) {
+if (!isset($fields['action']) || !in_array($fields['action'], array('checkOrder', 'paymentAviso'))) {
     $modx->sendRedirect($modx->makeUrl($modx->getOption('ShopModxYandexKassa.success_resource_id')));
 }
 
