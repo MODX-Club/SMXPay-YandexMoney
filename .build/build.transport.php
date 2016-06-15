@@ -74,7 +74,7 @@ include_once $sources['builder_includes'].'system.events.php';
 include_once $sources['builder_includes'].'category.php';
 
 /* add plugins */
-# include_once $sources['builder_includes'] . 'plugins.php';
+include_once $sources['builder_includes'].'plugins.php';
 
 /* add snippets */
 include_once $sources['builder_includes'].'snippets.php';
