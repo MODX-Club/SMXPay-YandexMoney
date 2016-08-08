@@ -152,7 +152,6 @@
                 <input type="hidden" name="shopId" value="{$modx->getOption('ShopModxYandexKassa.SHOP_ID')}">
                 <input type="hidden" name="scid" value="{$modx->getOption('ShopModxYandexKassa.SC_ID')}">
                 <input type="hidden" name="CustomerNumber" size="64" value="{$modx->user->id}">
-                <input name="orderNumber" value="{$orderNumber}" type="hidden"/>
 
                 {*<!-- CustomerNumber -- до 64 символов; идентификатор плательщика в ИС Контрагента.
 
@@ -166,6 +165,7 @@
             {/block}
 
             {*<!-- необязательные поля (все параметры яндекс.кассы регистрозависимые) -->*}
+
             {if $fields}
                 {foreach $fields as $key => $val}
                     {if is_array($val)}

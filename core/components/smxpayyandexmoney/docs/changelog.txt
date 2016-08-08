@@ -1,5 +1,9 @@
 Changelog file for SMXPayYandexKassa component.
 
+## SMXPayYandexKassa-1.2.0-beta
+* Shopmodx-3.1.1-beta compatibility
+* Minor fixes
+
 ## SMXPayYandexKassa-1.1.0-beta
 * Events added
 * Multiple fixes

@@ -1,8 +1,8 @@
 <?php
 
-require_once MODX_CORE_PATH.'components/basket/processors/web/payments/create.class.php';
+require_once MODX_CORE_PATH.'components/shopmodx/processors/shopmodx/payments/create.class.php';
 
-class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProcessor
+class modYandexmoneyWebPaymentsCreateProcessor extends modShopmodxPaymentsCreateProcessor
 {
     protected $SHOP_ID;
     protected $SHOP_PASSWORD;
@@ -27,21 +27,14 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
 
         $this->setProperties((array) $this->getProperty('request'));
 
-        # if(!(int)$this->getProperty('order_id')){
-        #     return 'Не был получен ID заказа';
-        # }
-
         $this->SHOP_ID = $this->modx->getOption('ShopModxYandexKassa.SHOP_ID');
         $this->SHOP_PASSWORD = $this->modx->getOption('ShopModxYandexKassa.SHOP_PASSWORD');
         $this->SECURITY_TYPE = $this->modx->getOption('ShopModxYandexKassa.SECURITY_TYPE', null, 'MD5');
 
-        # $this->setProperties(array(
-        #     "SECURITY_TYPE" => $this->modx->getOption('ShopModxYandexKassa.SECURITY_TYPE', null, 'MD5'),
-        # ));
-
         $this->setDefaultProperties(array(
             'action' => $this->getProperty('action'),
             'output_format' => 'XML',      // XML
+            'hide_log' => true,
         ));
 
         $this->setProperties(array(
@@ -70,7 +63,7 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
             'processor' => &$this,
         ));
 
-        $ok = current($ok);
+        $ok = end($ok);
         if ($ok != '' && $ok !== true) {
             return $ok;
         }
@@ -99,7 +92,6 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
         $action = $this->getProperty('action');
         $sum = (float) $this->getProperty('sum');
         $response = null;
-
         $ok = $this->beforeOrderProcess();
 
         if ($ok !== true) {
@@ -111,9 +103,6 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
             1. checkOrder - проверка разрешение от ИМ на провод платежа
             2. paymentAviso - действие магазина в ответ на проведенный в Яндексе платеж.
         */
-
-        # print $action;
-        # exit;
         switch ($action) {
 
             case 'checkOrder':
@@ -128,9 +117,11 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
 
                 # die('sdfds');
 
-                $this->onCheckOrder();
+                $ok = $this->onCheckOrder();
+                if ($ok !== true) {
+                    return $this->failure($ok);
+                }
 
-                # return $this->success($this->buildResponse($action, $request['invoiceId'], 0));
                 return $this->success('');
                 break;
 
@@ -139,7 +130,11 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
                 # $action = $this->getProperty('action');
                 # return $this->buildResponse($action, $request['invoiceId'], 0);
 
-                $this->onPaymentAviso();
+                $ok = $this->onPaymentAviso();
+
+                if ($ok !== true) {
+                    return $this->failure($ok);
+                }
 
                 break;
 
@@ -163,7 +158,7 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
 
     public function checkSignature()
     {
-        $request = $this->getProperties();
+        $request = $this->getProperties('request');
         $action = $this->getProperty('action');
 
         $this->log('Start '.$action);
@@ -174,10 +169,12 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
         switch ($this->SECURITY_TYPE) {
 
             case 'MD5':
-                $this->log('Request: '.print_r($request, true));
+                if (!$this->getProperty('hide_log')) {
+                    $this->log('Request: '.print_r($request, true));
+                }
 
                 // If the MD5 checking fails, respond with "1" error code
-                if (!$this->checkMD5($request)) {
+                if (!$this->checkMD5()) {
                     # return $this->buildResponse($action, $request['invoiceId'], 1);
                     return 'Неверная подпись';
                     # return $this->failure($response);
@@ -191,8 +188,9 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
                 break;
 
             case 'PKCS7':
-
-                $this->log('Request: '.print_r($request, true));
+                if (!$this->getProperty('hide_log')) {
+                    $this->log('Request: '.print_r($request, true));
+                }
 
                 if (($request = $this->verifySign()) == null) {
                     # return $this->buildResponse($action, null, 200);
@@ -208,7 +206,7 @@ class modYandexmoneyWebPaymentsCreateProcessor extends modWebPaymentsCreateProce
         return true;
     }
 
-    private function checkMD5($request)
+    private function checkMD5()
     {
         $request = $this->getProperty('request');
         $action = $this->getProperty('action');
