@@ -1,5 +1,4 @@
 <?php
-
 $fields = array_merge(
     (array) $scriptProperties,
     (array) $modx->request->getParameters([], 'POST')

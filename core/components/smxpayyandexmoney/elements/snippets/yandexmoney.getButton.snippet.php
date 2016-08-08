@@ -1,5 +1,4 @@
 <?php
-
 $fields = array_merge(
     array(),
     (array) $scriptProperties
