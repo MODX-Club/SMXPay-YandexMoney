@@ -1,6 +1,6 @@
 <?php
 
 $pkgName = 'SMXPayYandexMoney';
-$pkgVersion = '1.1.0';
+$pkgVersion = '1.2.0';
 $pkgRelease = 'beta';
-$pkgDebug = true;
+$pkgDebug = false;

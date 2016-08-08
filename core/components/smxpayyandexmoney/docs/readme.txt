@@ -1,7 +1,7 @@
 --------------------
 Extra: SMXPayYandexKassa
 --------------------
-Version: 1.1.0
+Version: 1.2.0
 Author: MODXClub <info@modxclub.ru>
 License: GNU GPLv2 (or later at your option)
 
